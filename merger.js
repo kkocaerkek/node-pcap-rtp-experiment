@@ -9,7 +9,7 @@ const { EventEmitter } = require('events');
     Parses pcap file containing two channel RTP (8000 Hz alaw) packets. Extracts RTP packets from pcap and combine two channels into a stereo raw audio file 
 */ 
 
-const pcapPath = 'sip_call_rtp_packets.pcap'; // input file path
+const pcapPath = 'gh-g711-test-rtp.pcap'; // input file path
 const outputPathStereo = 'stereo.raw'; // raw audio output path
 
 class RTPPacketReader extends EventEmitter {
@@ -26,10 +26,10 @@ class RTPPacketReader extends EventEmitter {
         this.socket = new PassThrough();
 
         this.socket.on('data', (data) => {
-            const udpHeader = data.slice(34, 42);
+            const udpHeader = data.slice(36, 44);
             const srcPort = udpHeader.readUInt16BE(0);
             const udpLength = udpHeader.readUInt16BE(4);
-            const udpPayload = data.slice(42, 42 + udpLength - 8);
+            const udpPayload = data.slice(44, 44 + udpLength - 8);
 
             try{
                 const rtpPacket = rtpParser.parseRtpPacket(udpPayload);
@@ -78,8 +78,8 @@ class RTPPacketReader extends EventEmitter {
 const rtpReader = new RTPPacketReader();
 rtpReader.bind();
 
-const leftPort = 8000;
-const rightPort = 40376;
+const leftPort = 14286;
+const rightPort = 14678;
 
 const readStreamLeft = rtpReader.createStream(leftPort);
 const readStreamRight = rtpReader.createStream(rightPort);
@@ -127,18 +127,19 @@ function processAudioBuffers() {
 const parser = PcapParser.parse(fs.createReadStream(pcapPath));
 
 parser.on('packet', (packet) => {
-    const ethertype = packet.data.readUInt16BE(12);
-
+    const ethertype = packet.data.readUInt16BE(14);
     // process only IPv4 packets
     if (ethertype === 0x0800) {
-        const ipHeader = packet.data.slice(14, 34); 
+        const ipHeader = packet.data.slice(16, 36);
         const protocol = ipHeader.readUInt8(9); 
-
+        
+        
         // process only UDP packets
         if (protocol === 17) {
-            const udpHeader = packet.data.slice(34, 42);
-            const udpPayload = packet.data.slice(42);
-
+            const udpHeader = packet.data.slice(36, 44);
+            console.log(udpHeader);
+            const udpPayload = packet.data.slice(44);
+            
             rtpReader.push(packet.data);
         }
     }
