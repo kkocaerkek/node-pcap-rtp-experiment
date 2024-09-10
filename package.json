@@ -1,0 +1,15 @@
+{
+  "name": "stereo-merger",
+  "version": "1.0.0",
+  "description": "Parses pcap file containing two channel RTP (8000 Hz alaw) packets. Extracts RTP packets from pcap and combine two channels into a stereo raw audio file ",
+  "main": "merger.js",
+  "scripts": {
+    "start": "node merger.js"
+  },
+  "author": "Kenan Kocaerkek",
+  "license": "ISC",
+  "devDependencies": {
+    "pcap-parser": "^0.2.1",
+    "rtp-parser": "^1.0.0"
+  }
+}
