@@ -12,7 +12,7 @@ const { EventEmitter } = require('events');
 
 // ********* YOU CAN TRY JITTER AND PACKET LOSS EFFECTS BY CHANGING THESE VALUES BELOW ******** 
 const jitterBufferMS = 100; // miliseconds
-const packetLossSimulationProbability = 0.2; // 0-1
+const packetLossSimulationProbability = 0.0; // 0-1
 const jitterSimulationProbability = 0.0; // 0 - 1
 // ***********************************************************************************
 
@@ -110,7 +110,7 @@ let rightBuffer = []
 readStreamLeft.on("data", (data) => {
     const rtpPacket = rtpParser.parseRtpPacket(data);
     leftBuffer.push(rtpPacket);
-    leftBuffer.sort((a, b) => {a.sequenceNumber - b.sequenceNumber});
+    leftBuffer.sort((a, b) => a.sequenceNumber - b.sequenceNumber);
     //console.log(`left buffer len: ${leftBuffer.length} jitter buffer size: ${jitterBufferSize}`);
     if(leftBuffer.length > jitterBufferSize){
         processAudioBuffers();
